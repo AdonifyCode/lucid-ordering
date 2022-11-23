@@ -27,7 +27,7 @@ node ace configure @adonify/lucid-ordering
 
 ```ts
 import { BaseModel } from "@ioc:Adonis/Lucid/Orm";
-import { compose } from "@poppinss/utils/build/helpers";
+import { compose } from '@ioc:Adonis/Core/Helpers'
 import { Ordered } from "@ioc:Adonify/LucidOrdering";
 
 export default class Todo extends compose(BaseModel, Ordered('todos')) {}
@@ -67,7 +67,7 @@ You can do this by passing an orderColumnName to the OrderedMixin as follows.
 ```ts
 import { BaseModel, BelongsTo, belongsTo, column } from "@ioc:Adonis/Lucid/Orm";
 import Board from "App/Models/Board";
-import { compose } from "@poppinss/utils/build/helpers";
+import { compose } from '@ioc:Adonis/Core/Helpers'
 import { Ordered } from "@ioc:Adonify/LucidOrdering";
 
 export default class Todo extends compose(BaseModel, Ordered('todos', { orderColumnName: 'boardId' })) {
