@@ -3,7 +3,7 @@
 
 ## Introduction
 
-This package provides a convenient mixin to create ordered behavior (sequences) with your Lucid models. This sequence order can be maintained at a per table level or via a ordered column.
+This package provides a convenient mixin to create ordered behavior (sequences) with your Lucid models. This sequence order can be maintained at a per table level or via an ordered column.
 
 ## Installation
 
@@ -23,9 +23,13 @@ node ace configure @adonify/lucid-ordering
 
 ## Usage
 
-### Add the mixin to your Lucid Model
+### Add the mixin to any Lucid model
 
 ```ts
+import { BaseModel } from "@ioc:Adonis/Lucid/Orm";
+import { compose } from "@poppinss/utils/build/helpers";
+import { Ordered } from "@ioc:Adonify/LucidOrdering";
+
 export default class Todo extends compose(BaseModel, Ordered('todos')) {}
 ```
 
@@ -61,6 +65,11 @@ We often need to maintain different sequences on one table with respect to a uni
 You can do this by passing an orderColumnName to the OrderedMixin as follows.
 
 ```ts
+import { BaseModel, BelongsTo, belongsTo, column } from "@ioc:Adonis/Lucid/Orm";
+import Board from "App/Models/Board";
+import { compose } from "@poppinss/utils/build/helpers";
+import { Ordered } from "@ioc:Adonify/LucidOrdering";
+
 export default class Todo extends compose(BaseModel, Ordered('todos', { orderColumnName: 'boardId' })) {
   @column()
   public boardId: number;
@@ -151,7 +160,7 @@ This will sync all models in the sequence, with respect to the `orderColumnName`
 > 
 > This package relies on keeping all models in an ordered sequence (ie. 1, 2, 3, ...n). If you manually update these values through the database, you will need to sync the sequence again for the various methods and hooks to work correctly.
 >
-> Furthermore, this approach relies onm potentially doing an update on each row of the sequence when a row is deleted, and on multiple rows during order moves. This means large datasets may not be optimal for your performance needs and you should use this package with caution.
+> Furthermore, this approach relies on potentially doing an update on each row of the sequence when a row is deleted, and on multiple rows during order moves. This means large datasets may not be optimal for your performance needs and you should use this package with caution.
 
 ### Model functions 
 
