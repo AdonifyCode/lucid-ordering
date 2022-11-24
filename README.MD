@@ -1,6 +1,8 @@
 # Adonis Lucid Ordering
 > A simple way to maintain order with your Lucid models.
 
+[![npm-image]][npm-url] [![license-image]][license-url] [![typescript-image]][typescript-url]
+
 ## Introduction
 
 This package provides a convenient mixin to create ordered behavior (sequences) with your Lucid models. This sequence order can be maintained at a per table level or via an ordered column.
@@ -180,3 +182,12 @@ This will sync all models in the sequence, with respect to the `orderColumnName`
 ## Issues
 
 If you have a question or found a bug, feel free to [open an issue](https://github.com/AdonifyCode/lucid-ordering/issues).
+
+[npm-image]: https://img.shields.io/npm/v/@adonify/lucid-ordering.svg?style=for-the-badge&logo=npm
+[npm-url]: https://npmjs.org/package/@adonify/lucid-ordering "npm"
+
+[license-image]: https://img.shields.io/npm/l/@adonify/lucid-ordering?color=blueviolet&style=for-the-badge
+[license-url]: LICENSE.md "license"
+
+[typescript-image]: https://img.shields.io/badge/Typescript-294E80.svg?style=for-the-badge&logo=typescript
+[typescript-url]:  "typescript"
