@@ -1,6 +1,6 @@
 {
   "name": "@adonify/lucid-ordering",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Simple ordering for lucid models with AdonisJS.",
   "main": "build/providers/LucidOrderingProvider.js",
   "types": "build/adonis-typings/index.d.ts",
