@@ -7,9 +7,10 @@ export default class LucidOrderingProvider {
 
   public register() {
     this.app.container.singleton('Adonify/LucidOrdering', () => {
-      const Ordered = require('../src/Mixins/Ordered').default
+      const { Ordered } = require('../src/Mixins/Ordered')
+      const { orderKey } = require('../src/Decorators/orderKey')
 
-      return { Ordered }
+      return { Ordered, orderKey }
     })
   }
 

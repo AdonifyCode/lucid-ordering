@@ -15,7 +15,6 @@ npm i @adonify/lucid-ordering
 # Or using Yarn
 
 yarn add @adonify/lucid-ordering
-
 ```
 
 ## Configuration 
@@ -32,13 +31,13 @@ import { BaseModel } from "@ioc:Adonis/Lucid/Orm";
 import { compose } from '@ioc:Adonis/Core/Helpers'
 import { Ordered } from "@ioc:Adonify/LucidOrdering";
 
-export default class Todo extends compose(BaseModel, Ordered('todos')) {}
+export default class Todo extends compose(BaseModel, Ordered) {}
 ```
 
-The mixin will set the model's table value to `todos` under the hood, make sure this is the table name from your migrations.
-
-
 ### Create the Todo migration or add an order field to your existing model.
+
+The column must be called `order`, however it doesn't need to be an integer. Any datatype that supports equality comparison will work.
+
 ```ts
 import BaseSchema from "@ioc:Adonis/Lucid/Schema";
 
@@ -50,7 +49,7 @@ export default class extends BaseSchema {
       table.increments("id");
       table.timestamp("created_at", { useTz: true });
       table.timestamp("updated_at", { useTz: true });
-      table.integer("order").notNullable();
+      table.integer("order").notNullable(); // 👈 the column is needed 
     });
   }
 
@@ -60,20 +59,21 @@ export default class extends BaseSchema {
 }
 ```
 
-### Ordered models with respect to an ordered column
+### Ordered models with respect to an order key 
 
-We often need to maintain different sequences on one table with respect to a unique field. For example we may have a Board model with Todo's that we need we need to keep in order corresponding the Board's id.
+We often need to maintain different sequences on one table with respect to a unique field. For example we may have a Board model with Todo's that we need we need to keep in order corresponding to the Board's id.
 
-You can do this by passing an orderColumnName to the OrderedMixin as follows.
+You can do this using the `orderKey()` decorator as follows. You can use the decorator on multiple columns to create unique combinations to maintain order with, but be aware this results in extra queries under the hood.
 
 ```ts
 import { BaseModel, BelongsTo, belongsTo, column } from "@ioc:Adonis/Lucid/Orm";
 import Board from "App/Models/Board";
 import { compose } from '@ioc:Adonis/Core/Helpers'
-import { Ordered } from "@ioc:Adonify/LucidOrdering";
+import { Ordered, orderKey } from "@ioc:Adonify/LucidOrdering";
 
-export default class Todo extends compose(BaseModel, Ordered('todos', { orderColumnName: 'boardId' })) {
+export default class Todo extends compose(BaseModel, Ordered) {
   @column()
+  @orderKey()
   public boardId: number;
 
   @belongsTo(() => Board)
@@ -90,12 +90,12 @@ export default class extends BaseSchema {
       table.increments("id");
       table.timestamp("created_at", { useTz: true });
       table.timestamp("updated_at", { useTz: true });
-      table.integer("order").notNullable();
+      table.integer("order").notNullable(); // 👈 order in the sequence 
       table
         .integer("board_id")
         .unsigned()
         .references("boards.id")
-        .onDelete("CASCADE");
+        .onDelete("CASCADE"); // 👈 key to track the sequence on the table 
     });
   }
 
@@ -117,7 +117,15 @@ const todo1 = await Todo.create({}) // will have order of 0
 const todo2 = await Todo.create({}) // will have order of 1
 ```
 
-#### With an ordered column
+If you wish to manually set the order when you create a model, you can supply it and the order will not be auto-generated.
+
+```ts
+// Assume no todos are present in the database yet
+const todo1 = await Todo.create({ order: 0 }) // will have order of 0 
+const todo2 = await Todo.create({ order: 2 }) // will have order of 2 
+```
+
+#### With an order key 
 
 ```ts
 // Assume no todos are present in the database yet
@@ -156,7 +164,7 @@ If your sequence were to ever become out of order, you can manually sync the seq
 await todo.syncSequence()
 ```
 
-This will sync all models in the sequence, with respect to the `orderColumnName` if it is present.
+This will sync all models in the sequence, with respect to any order keys present.
 
 > **Warning**
 > 

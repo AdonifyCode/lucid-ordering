@@ -5,6 +5,7 @@ import type { Ordered } from '@ioc:Adonify/LucidOrdering'
 import { compose } from '@poppinss/utils/build/helpers'
 import OrderedModelService from '../../../src/Helpers/OrderedModelService'
 import { ApplicationContract } from '@ioc:Adonis/Core/Application'
+import { orderKey } from '../../../src/Decorators/orderKey'
 const Application: ApplicationContract = global[Symbol.for('ioc.use')]('Adonis/Core/Application')
 
 let BaseModel: typeof BaseModelContract
@@ -27,7 +28,7 @@ test.group('Helpers.OrderedModelService.getHighestOrder', (group) => {
   })
 
   test('returns the highest order', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
     }
 
@@ -36,20 +37,18 @@ test.group('Helpers.OrderedModelService.getHighestOrder', (group) => {
       Ordered.create({ order: 1 }),
     ])
 
-    const high = await OrderedModelService.getHighestOrder({
-      orderedModel: second,
-      tableName: 'ordered',
-    })
+    const high = await OrderedModelService.getHighestOrder({ orderedModel: second })
 
     assert.equal(high, 1)
   })
 
   test('returns the highest order with respect to the order column', async ({ assert }) => {
-    await createOrderedTable({ orderColumn: 'test' })
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered', { orderColumnName: 'test' })) {
+    await createOrderedTable({ orderColumns: ['test'] })
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
 
       @column()
+      @orderKey()
       public test: number
     }
 
@@ -61,10 +60,7 @@ test.group('Helpers.OrderedModelService.getHighestOrder', (group) => {
       Ordered.create({ order: 1, test: 1 }),
     ])
 
-    const high = await OrderedModelService.getHighestOrder({
-      orderedModel: fourth,
-      tableName: 'ordered',
-    })
+    const high = await OrderedModelService.getHighestOrder({ orderedModel: fourth })
 
     assert.equal(high, 1)
   })

@@ -24,7 +24,7 @@ test.group('Mixins.Ordered.isLast', (group) => {
   })
 
   test('should return true if last ordered item', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number

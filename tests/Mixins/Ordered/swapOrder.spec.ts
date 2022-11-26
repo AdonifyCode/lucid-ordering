@@ -24,7 +24,7 @@ test.group('Mixins.Ordered.swapOrder', (group) => {
   })
 
   test('should swap the order of two ordered models', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number

@@ -24,7 +24,7 @@ test.group('Mixins.Ordered.moveUp', (group) => {
   })
 
   test('should move item up one order in the sequence', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
@@ -44,7 +44,7 @@ test.group('Mixins.Ordered.moveUp', (group) => {
   })
 
   test('should not move item if last item in the sequence', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
@@ -64,7 +64,7 @@ test.group('Mixins.Ordered.moveUp', (group) => {
   })
 
   test('should not move item if only one item in the sequence', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number

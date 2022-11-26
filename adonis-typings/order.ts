@@ -2,8 +2,11 @@ declare module '@ioc:Adonify/LucidOrdering' {
   import { LucidModel, LucidRow } from '@ioc:Adonis/Lucid/Orm'
   import { NormalizeConstructor } from '@ioc:Adonis/Core/Helpers'
 
+  export interface LucidModelOrdered extends LucidModel {
+    orderKeys?: { property: string }[]
+  }
+
   export interface OrderedModel extends LucidRow {
-    $orderColumnName?: string
     order: number
 
     /**
@@ -14,6 +17,8 @@ declare module '@ioc:Adonify/LucidOrdering' {
      * @remarks
      * If a number greater than the largest order is supplied,
      * it will default to the last possible order.
+     *
+     * If a number less than 0 is supplied, it will default to 0.
      */
     setOrder(this: this, order: number): Promise<void>
 
@@ -55,7 +60,7 @@ declare module '@ioc:Adonify/LucidOrdering' {
      * Swaps the order of two models.
      * @param modelToSwap The model instance to swap orders with.
      * @remarks
-     * If orderColumnName is set, the model instance must have the same orderColumnName value.
+     * If orderKeys are defined, the model instance must have the same orderKey values value.
      */
     swapOrder(modelToSwap: OrderedModel): Promise<void>
 
@@ -74,7 +79,7 @@ declare module '@ioc:Adonify/LucidOrdering' {
     /**
      * Sync the sequence of models, this method is also called after model deletion.
      * @remarks
-     * If you have defined the orderColumnName on your model, this will sync the sequence based on that value.
+     * If you have defined orderKeys on your model, this will sync the sequence based on that value.
      * Otherwise, the whole table will be synced.
      */
     syncSequence(): Promise<void>
@@ -86,10 +91,7 @@ declare module '@ioc:Adonify/LucidOrdering' {
     }
   }
 
-  const Ordered: (
-    tableName: string,
-    options?: { orderColumnName?: string }
-  ) => OrderedModelMixinContract
+  const Ordered: OrderedModelMixinContract
 
   export { Ordered }
 

@@ -4,6 +4,7 @@ import type { BaseModel as BaseModelContract, ColumnDecorator } from '@ioc:Adoni
 import type { Ordered } from '@ioc:Adonify/LucidOrdering'
 import { compose } from '@poppinss/utils/build/helpers'
 import { ApplicationContract } from '@ioc:Adonis/Core/Application'
+import { orderKey } from '../../../src/Decorators/orderKey'
 const Application: ApplicationContract = global[Symbol.for('ioc.use')]('Adonis/Core/Application')
 
 let BaseModel: typeof BaseModelContract
@@ -24,7 +25,7 @@ test.group('Mixins.Ordered.setOrder', (group) => {
   })
 
   test('should set a lower order', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
@@ -44,24 +45,28 @@ test.group('Mixins.Ordered.setOrder', (group) => {
   })
 
   test('should set a lower order with respect to the orderColumn', async ({ assert }) => {
-    await createOrderedTable({ orderColumn: 'test' })
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered', { orderColumnName: 'test' })) {
+    await createOrderedTable({ orderColumns: ['test_key'] })
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
+
       @column()
-      public test: number
+      @orderKey()
+      public testKey: number
     }
     const orderedModels = await Promise.all([
-      Ordered.create({ order: 0, test: 0 }),
-      Ordered.create({ order: 1, test: 0 }),
-      Ordered.create({ order: 2, test: 0 }),
-      Ordered.create({ order: 0, test: 1 }),
-      Ordered.create({ order: 1, test: 1 }),
-      Ordered.create({ order: 2, test: 1 }),
+      Ordered.create({ order: 0, testKey: 0 }),
+      Ordered.create({ order: 1, testKey: 0 }),
+      Ordered.create({ order: 2, testKey: 0 }),
+      Ordered.create({ order: 0, testKey: 1 }),
+      Ordered.create({ order: 1, testKey: 1 }),
+      Ordered.create({ order: 2, testKey: 1 }),
     ])
+
     await orderedModels[2].setOrder(1)
     await Promise.all(orderedModels.map((orderedModel) => orderedModel.refresh()))
+
     // First set should have their order updated
     assert.equal(orderedModels[0].order, 0)
     assert.equal(orderedModels[1].order, 2)
@@ -73,7 +78,7 @@ test.group('Mixins.Ordered.setOrder', (group) => {
   })
 
   test('should set a higher order', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
@@ -93,12 +98,14 @@ test.group('Mixins.Ordered.setOrder', (group) => {
   })
 
   test('should set a higher order with respect to the orderColumn', async ({ assert }) => {
-    await createOrderedTable({ orderColumn: 'test' })
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered', { orderColumnName: 'test' })) {
+    await createOrderedTable({ orderColumns: ['test'] })
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
+
       @column()
+      @orderKey()
       public test: number
     }
     const orderedModels = await Promise.all([
@@ -124,7 +131,7 @@ test.group('Mixins.Ordered.setOrder', (group) => {
   })
 
   test('should set order to last in the list', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
@@ -144,7 +151,7 @@ test.group('Mixins.Ordered.setOrder', (group) => {
   })
 
   test('should set order to first in the list', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
@@ -166,7 +173,7 @@ test.group('Mixins.Ordered.setOrder', (group) => {
   test('should set order to last in sequence if larger number than greatest order is passed', async ({
     assert,
   }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
@@ -188,7 +195,7 @@ test.group('Mixins.Ordered.setOrder', (group) => {
   test('should set order to last in sequence if the last item in the sequence is set to a higher order', async ({
     assert,
   }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
@@ -206,5 +213,40 @@ test.group('Mixins.Ordered.setOrder', (group) => {
     assert.equal(first.order, 0)
     assert.equal(second.order, 1)
     assert.equal(third.order, 2)
+  })
+
+  test('should set order with respect to multiple order columns', async ({ assert }) => {
+    await createOrderedTable({ orderColumns: ['test_key', 'test_key_two'] })
+    class Ordered extends compose(BaseModel, OrderedMixin) {
+      public static table = 'ordered'
+
+      @column({ isPrimary: true })
+      public id: number
+
+      @column()
+      @orderKey()
+      public testKey: number
+
+      @column()
+      @orderKey()
+      public testKeyTwo: number
+    }
+
+    const orderedModels = await Promise.all([
+      Ordered.create({ order: 0, testKey: 0, testKeyTwo: 1 }),
+      Ordered.create({ order: 1, testKey: 0, testKeyTwo: 1 }),
+      Ordered.create({ order: 0, testKey: 0, testKeyTwo: 2 }),
+      Ordered.create({ order: 1, testKey: 0, testKeyTwo: 2 }),
+    ])
+
+    await orderedModels[0].setOrder(1)
+
+    await Promise.all(orderedModels.map((orderedModel) => orderedModel.refresh()))
+    // First set should have their order updated
+    assert.equal(orderedModels[0].order, 1)
+    assert.equal(orderedModels[1].order, 0)
+    // Second set should not be changed
+    assert.equal(orderedModels[2].order, 0)
+    assert.equal(orderedModels[3].order, 1)
   })
 })

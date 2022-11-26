@@ -24,7 +24,7 @@ test.group('Mixins.Ordered.modeBefore', (group) => {
   })
 
   test('should move model before another in the sequence', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
@@ -44,7 +44,7 @@ test.group('Mixins.Ordered.modeBefore', (group) => {
   })
 
   test('should move model before first item in the sequence', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number
@@ -64,7 +64,7 @@ test.group('Mixins.Ordered.modeBefore', (group) => {
   })
 
   test('should move model before last item in the sequence', async ({ assert }) => {
-    class Ordered extends compose(BaseModel, OrderedMixin('ordered')) {
+    class Ordered extends compose(BaseModel, OrderedMixin) {
       public static table = 'ordered'
       @column({ isPrimary: true })
       public id: number

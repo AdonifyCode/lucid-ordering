@@ -3,10 +3,10 @@ const Database: DatabaseContract = global[Symbol.for('ioc.use')]('Adonis/Lucid/D
 
 export async function createOrderedTable({
   tableName = 'ordered',
-  orderColumn,
+  orderColumns,
 }: {
   tableName?: string
-  orderColumn?: string
+  orderColumns?: string[]
 } = {}) {
   await Database.connection().schema.dropTableIfExists(tableName)
   await Database.connection().schema.createTableIfNotExists(tableName, (table) => {
@@ -15,9 +15,9 @@ export async function createOrderedTable({
     table.timestamp('updated_at', { useTz: true })
     table.integer('order')
 
-    if (orderColumn) {
-      table.integer(orderColumn)
-    }
+    orderColumns?.forEach((column) => {
+      table.integer(column)
+    })
   })
 }
 
